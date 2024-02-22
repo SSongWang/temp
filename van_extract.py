@@ -8,7 +8,7 @@ import torch
 import torch.nn as nn
 
 #from efficientnet_pytorch import EfficientNet
-from van import van_b1
+from cross_view_transformer.model.backbones.van import van_b1
 
 # Precomputed aliases
 MODELS = {
@@ -99,7 +99,7 @@ class EfficientNetExtractor(torch.nn.Module):
 
         #     result.append(x)
 
-        return [result[2], result[4]]#[result[i] for i in self.idx_pick]
+        return [result[1], result[3]]#[result[i] for i in self.idx_pick]
 
 
 class SequentialWithArgs(nn.Sequential):
