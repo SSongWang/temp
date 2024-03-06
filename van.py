@@ -13,6 +13,12 @@ from timm.models.layers import DropPath, to_2tuple, trunc_normal_
 from timm.models.registry import register_model
 from timm.models.vision_transformer import _cfg
 import math
+import collections
+
+try:
+    from collections import OrderedDict
+except ImportError:
+    OrderedDict = dict
 
 
 
@@ -288,15 +294,29 @@ model_urls = {
 
 def load_model_weights(model, arch, kwargs):
     url = model_urls[arch]
-    checkpoint = torch.hub.load_state_dict_from_url(
-        url=url, map_location="cpu", check_hash=True
-    )
-    strict = True
-    if "num_classes" in kwargs and kwargs["num_classes"] != 1000:
-        strict = False
-        del checkpoint["state_dict"]["head.weight"]
-        del checkpoint["state_dict"]["head.bias"]
-    model.load_state_dict(checkpoint["state_dict"], strict=False)
+    checkpoint = torch.load('/data/song.wang/data/cross_view_transformers/van_trained.pth')#torch.hub.load_state_dict_from_url(
+        #url=url, map_location="cpu", check_hash=True
+    #)
+    #strict = True
+    #if "num_classes" in kwargs and kwargs["num_classes"] != 1000:
+        #strict = False
+        #del checkpoint["state_dict"]["head.weight"]
+        #del checkpoint["state_dict"]["head.bias"]
+    checkpoint_dict = checkpoint["state_dict"]
+    del_name = "head"
+    #del checkpoint_dict['module.head']
+    checkpoint_dict_new = OrderedDict()
+    for k, v in checkpoint_dict.items():
+        if del_name not in k:
+            #del checkpoint_dict[k]
+    #for k, v in checkpoint_dict.items():
+            name = k[14:]
+            checkpoint_dict_new[name]=v
+
+    pretrained_dict = {k: v for k, v in checkpoint_dict_new.items() if k in checkpoint_dict_new}
+    #model.load_state_dict(checkpoint["state_dict"], strict=False)
+    model.load_state_dict(pretrained_dict)
+    #print(model)
     return model
 
 
@@ -313,7 +333,7 @@ def van_b0(pretrained=False, **kwargs):
 
 
 @register_model
-def van_b1(pretrained=False, **kwargs):
+def van_b1(pretrained=True, **kwargs):
     model = VAN(
         embed_dims=[64, 128, 320, 512], mlp_ratios=[8, 8, 4, 4],
         norm_layer=partial(nn.LayerNorm, eps=1e-6), depths=[2, 2, 4, 2],

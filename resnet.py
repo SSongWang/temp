@@ -10,6 +10,14 @@ resnet18_url = 'https://download.pytorch.org/models/resnet18-5c106cde.pth'
 
 
 from torch.nn import BatchNorm2d
+from timm.models.registry import register_model
+
+import collections
+
+try:
+    from collections import OrderedDict
+except ImportError:
+    OrderedDict = dict
 
 
 def conv3x3(in_planes, out_planes, stride=1):
@@ -85,12 +93,12 @@ class Resnet18(nn.Module):
         return [x, feat8, feat16, feat32]
 
     def init_weight(self):
-        state_dict = torch.load('/home/swang/cross_view_transformers/model_final_v1_city_new.pth')# modelzoo.load_url(resnet18_url)
+        state_dict = torch.load('/data/song.wang/data/cross_view_transformers/model_final_v1_city_new.pth')# modelzoo.load_url(resnet18_url)
         self_state_dict = self.state_dict()
         #for k, v in state_dict.items():
         #    if 'fc' in k: continue
         #    self_state_dict.update({k: v})
-        self.load_state_dict(self_state_dict,strict=False)
+        self.load_state_dict(self_state_dict, strict=True)
 
     def get_params(self):
         wd_params, nowd_params = [], []
@@ -103,6 +111,24 @@ class Resnet18(nn.Module):
                 nowd_params += list(module.parameters())
         return wd_params, nowd_params
 
+def load_model_city(model):
+    checkpoint = torch.load('/data/song.wang/data/cross_view_transformers/model_final_v1_city_new.pth')
+    #checkpoint_dict = checkpoint["state_dict"]
+    pretrained_dict = OrderedDict()
+    name_layer = "resnet"
+    for k, v in checkpoint.items():
+        if name_layer in k:
+            name = k[10:]
+            pretrained_dict[name]=v
+    model.load_state_dict(pretrained_dict)
+    return model
+
+@register_model
+def resnet(pretrained=True):
+    model = Resnet18()
+    if pretrained:
+        model = load_model_city(model)
+    return model
 
 if __name__ == "__main__":
     net = Resnet18()

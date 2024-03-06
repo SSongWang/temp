@@ -8,7 +8,7 @@ import torch
 import torch.nn as nn
 
 #from efficientnet_pytorch import EfficientNet
-from cross_view_transformer.model.backbones.resnet import Resnet18
+from cross_view_transformer.model.backbones.resnet import resnet
 
 # Precomputed aliases
 MODELS = {
@@ -61,7 +61,7 @@ class EfficientNetExtractor(torch.nn.Module):
         # We can set memory efficient swish to false since we're using checkpointing
         # net = EfficientNet.from_pretrained(model_name)
         # net.set_swish(False)
-        self.net = Resnet18()####van(pretrained=True)
+        self.net = resnet(pretrained=True)####van(pretrained=True)
 
         # drop = net._global_params.drop_connect_rate / len(net._blocks)
         # blocks = [nn.Sequential(net._conv_stem, net._bn0, net._swish)]
