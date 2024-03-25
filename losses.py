@@ -3,7 +3,6 @@ import logging
 
 from fvcore.nn import sigmoid_focal_loss
 
-#from abc import ABC
 import torch.nn as nn
 
 
@@ -44,7 +43,7 @@ class BinarySegmentationLoss(SigmoidFocalLoss):
     def forward(self, pred_d, batch):
         if isinstance(pred_d, dict):
             pred = pred_d['bev']
-            embeddings = pred_d['embedding']
+            #embeddings = pred_d['embedding']
 
         label = batch['bev']
 
@@ -54,14 +53,14 @@ class BinarySegmentationLoss(SigmoidFocalLoss):
 
         loss = super().forward(pred, label)
 
-        loss_contrastive = self.contrastive(embeddings, label, pred)
+        #loss_contrastive = self.contrastive(embeddings, label, pred)
 
         if self.min_visibility is not None:
             mask = batch['visibility'] >= self.min_visibility
             loss = loss[mask[:, None]]
-            #loss_contrastive = loss_contrastive[mask[:, None]]
+            ###loss_contrastive = loss_contrastive[mask[:, None]]
 
-        return loss.mean()+0.5*loss_contrastive.mean()
+        return loss.mean()#+0.005*loss_contrastive.mean()
 
 
 class CenterLoss(SigmoidFocalLoss):

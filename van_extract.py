@@ -8,7 +8,7 @@ import torch
 import torch.nn as nn
 
 #from efficientnet_pytorch import EfficientNet
-from cross_view_transformer.model.backbones.van import van_b1
+from cross_view_transformer.model.backbones.van1 import van_b1
 
 # Precomputed aliases
 MODELS = {
