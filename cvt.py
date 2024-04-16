@@ -29,7 +29,7 @@ class CrossViewTransformer(nn.Module):
         self.encoder = encoder
         self.decoder = decoder
         self.outputs = outputs
-        self.proj = ProjectionHead(dim_in=self.decoder.out_channels, proj_dim=256, proj='convmlp')
+        #self.proj = ProjectionHead(dim_in=self.decoder.out_channels, proj_dim=256, proj='convmlp')
 
         outchannels = sum(self.decoder.blocks)
 
@@ -52,22 +52,12 @@ class CrossViewTransformer(nn.Module):
             
         y_out = torch.cat(y_list, 1)
 
-        embdding = self.proj(y[0])
+        #embdding = self.proj(y[0])
 
         z = self.to_logits(y_out)
-        #z_out = {}
-
-        #for k, (start, stop) in self.outputs.items():
-        #    if k!='embedding':
-        #        temp_dic={k: z[:, start:stop]}
-        #        z_out.update(temp_dic)
-
 
         z_out = {k: z[:, start:stop] for k, (start, stop) in self.outputs.items()}
-        z_out['embedding'] = embdding
-        #print(z_out.keys())
-        #print(z_out['embedding'].shape)
-        #os.exit()
+        #z_out['embedding'] = embdding
 
         return z_out#{k: z[:, start:stop] for k, (start, stop) in self.outputs.items()}
 

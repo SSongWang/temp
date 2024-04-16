@@ -93,7 +93,7 @@ class Resnet18(nn.Module):
         return [x, feat8, feat16, feat32]
 
     def init_weight(self):
-        state_dict = torch.load('/data/song.wang/data/cross_view_transformers/model_final_v1_city_new.pth')# modelzoo.load_url(resnet18_url)
+        state_dict = torch.load('/home/swang/cross_view_transformers/model_final_v1_city_new.pth')# modelzoo.load_url(resnet18_url)
         self_state_dict = self.state_dict()
         #for k, v in state_dict.items():
         #    if 'fc' in k: continue
@@ -112,7 +112,7 @@ class Resnet18(nn.Module):
         return wd_params, nowd_params
 
 def load_model_city(model):
-    checkpoint = torch.load('/data/song.wang/data/cross_view_transformers/model_final_v1_city_new.pth')
+    checkpoint = torch.load('/home/swang/cross_view_transformers/model_final_v1_city_new.pth')
     #checkpoint_dict = checkpoint["state_dict"]
     pretrained_dict = OrderedDict()
     name_layer = "resnet"

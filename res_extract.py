@@ -8,7 +8,7 @@ import torch
 import torch.nn as nn
 
 #from efficientnet_pytorch import EfficientNet
-from cross_view_transformer.model.backbones.resnet import resnet
+from cross_view_transformer.model.backbones.resnet_d import resnet
 
 # Precomputed aliases
 MODELS = {
