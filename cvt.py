@@ -29,9 +29,11 @@ class CrossViewTransformer(nn.Module):
         self.encoder = encoder
         self.decoder = decoder
         self.outputs = outputs
-        #self.proj = ProjectionHead(dim_in=self.decoder.out_channels, proj_dim=256, proj='convmlp')
+        ##self.proj = ProjectionHead(dim_in=self.decoder.out_channels, proj_dim=256, proj='convmlp')
 
-        outchannels = sum(self.decoder.blocks)
+        #outchannels = 64#sum(self.decoder.blocks)
+        outchannels = 2*self.decoder.out_channels
+        #self.conv = nn.Conv2d(128, 64, 3, padding=1, bias=False)
 
         self.to_logits = nn.Sequential(
             nn.Conv2d(outchannels, dim_last, 3, padding=1, bias=False),
@@ -40,21 +42,26 @@ class CrossViewTransformer(nn.Module):
             nn.Conv2d(dim_last, dim_max, 1))
 
     def forward(self, batch):
-        x = self.encoder(batch)
+        x, y1 = self.encoder(batch)
         y = self.decoder(x)
+        #y1_d = self.conv(y1)
+
+        y_con = torch.cat((y,y1), 1)
 
         #########################
-        y.reverse()
-        output_size = y[0].size()[2:]
-        y_list =[y[0]]
-        for i in range(1, len(y)):
-            y_list.append(nn.functional.interpolate(y[i], output_size, mode='bilinear', align_corners=True))
-            
-        y_out = torch.cat(y_list, 1)
+        #y.reverse()
+        #output_size = y[0].size()[2:]
+        #y_list =[y[0]]
+        #for i in range(1, len(y)):
+        #    y_list.append(nn.functional.interpolate(y[i], output_size, mode='bilinear', align_corners=True))
+        #    
+        #y_out = torch.cat(y_list, 1)
 
         #embdding = self.proj(y[0])
 
-        z = self.to_logits(y_out)
+        #z = self.to_logits(y_out)
+        z = self.to_logits(y_con)
+
 
         z_out = {k: z[:, start:stop] for k, (start, stop) in self.outputs.items()}
         #z_out['embedding'] = embdding
