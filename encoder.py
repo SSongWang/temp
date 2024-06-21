@@ -137,8 +137,8 @@ class BEVEmbedding_y(nn.Module):
         super().__init__()
 
         # each decoder block upsamples the bev embedding by a factor of 2
-        h = bev_height 
-        w = bev_width
+        h = bev_height // 2 
+        w = bev_width // 2
 
         # bev coordinates
         grid = generate_grid(h, w).squeeze(0)
@@ -348,9 +348,9 @@ class ConvBNReLU(nn.Module):
 class SpatialPath(nn.Module):
     def __init__(self, *args, **kwargs):
         super(SpatialPath, self).__init__()
-        self.conv1 = ConvBNReLU(3, 64, ks=7, stride=2, padding=3)
-        self.conv2 = ConvBNReLU(64, 64, ks=3, stride=2, padding=1)
-        self.conv3 = ConvBNReLU(64, 64, ks=3, stride=2, padding=1)
+        self.conv1 = ConvBNReLU(3, 32, ks=7, stride=2, padding=3)
+        self.conv2 = ConvBNReLU(32, 32, ks=3, stride=2, padding=1)
+        self.conv3 = ConvBNReLU(32, 64, ks=3, stride=2, padding=1)
         self.conv_out = ConvBNReLU(64, 64, ks=1, stride=1, padding=0)
 
 

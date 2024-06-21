@@ -34,6 +34,12 @@ class CrossViewTransformer(nn.Module):
         #outchannels = 64#sum(self.decoder.blocks)
         outchannels = 2*self.decoder.out_channels
         #self.conv = nn.Conv2d(128, 64, 3, padding=1, bias=False)
+        self.upsample = nn.Sequential(
+                nn.Upsample(scale_factor=2, mode='bilinear', align_corners=True),
+                nn.Conv2d(64, 64, 3, padding=1, bias=False),
+                nn.BatchNorm2d(64),
+                nn.ReLU(inplace=True))
+
 
         self.to_logits = nn.Sequential(
             nn.Conv2d(outchannels, dim_last, 3, padding=1, bias=False),
@@ -45,8 +51,9 @@ class CrossViewTransformer(nn.Module):
         x, y1 = self.encoder(batch)
         y = self.decoder(x)
         #y1_d = self.conv(y1)
+        y1_d = self.upsample(y1)
 
-        y_con = torch.cat((y,y1), 1)
+        y_con = torch.cat((y,y1_d), 1)
 
         #########################
         #y.reverse()
